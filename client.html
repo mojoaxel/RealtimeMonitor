@@ -33,14 +33,107 @@
 			margin: 0px;
 			padding: 0px;
 			border-bottom: 2px solid green;
-		} 
+		}
 		
 		header h1 {
 			display: inline-block;
 			width: auto;
 			margin: 0px;
 			padding: 0px;
-		} 
+		}
+		
+		header #pulse {
+			float: right;
+			content: "";
+			display: block;
+			position: absolute;
+			top: 8px;
+			right: 11px;
+			width: 20px;
+			height: 20px;
+			border: 2px solid;
+			border-radius: 20px;
+			
+			color: rgba(255,0,0, 0.6);
+			background-color: rgba(255,0,0, 0.4);
+		}
+		
+		header #pulse:before {
+			content: "inactive";
+			margin-left: -80px;
+		}
+		
+		header #pulse.active:before {
+			content: "active";
+			margin-left: -60px;
+		}
+		
+		#pulse.active {
+			-webkit-animation: pulse1 1s linear infinite;
+			-moz-animation: pulse1 1s linear infinite;
+			-ms-animation: pulse1 1s linear infinite;
+			animation: pulse1 1s linear infinite;
+		}
+
+		@keyframes "pulse1" {
+			0% {
+				color: rgba(0,255,0, 1);
+				background-color: rgba(0,255,0, 0.8);
+			}
+			90% {
+				color: rgba(0,255,0, 0.3);
+				background-color: rgba(0,255,0, 0.3);
+			}
+			100% {
+				color: rgba(0,255,0, 1);
+				background-color: rgba(0,255,0, 0.8);
+			}
+		}
+		
+		@-moz-keyframes pulse1 {
+			0% {
+				color: rgba(0,255,0, 1);
+				background-color: rgba(0,255,0, 0.8);
+			}
+			90% {
+				color: rgba(0,255,0, 0.3);
+				background-color: rgba(0,255,0, 0.3);
+			}
+			100% {
+				color: rgba(0,255,0, 1);
+				background-color: rgba(0,255,0, 0.8);
+			}
+		}
+		
+		@-webkit-keyframes "pulse1" {
+			0% {
+				color: rgba(0,255,0, 1);
+				background-color: rgba(0,255,0, 0.8);
+			}
+			90% {
+				color: rgba(0,255,0, 0.3);
+				background-color: rgba(0,255,0, 0.3);
+			}
+			100% {
+				color: rgba(0,255,0, 1);
+				background-color: rgba(0,255,0, 0.8);
+			}
+		}
+		
+		@-ms-keyframes "pulse1" {
+			0% {
+				color: rgba(0,255,0, 1);
+				background-color: rgba(0,255,0, 0.8);
+			}
+			90% {
+				color: rgba(0,255,0, 0.3);
+				background-color: rgba(0,255,0, 0.3);
+			}
+			100% {
+				color: rgba(0,255,0, 1);
+				background-color: rgba(0,255,0, 0.8);
+			}
+		}
 		
 		main {
 			overflow-y: scroll;
@@ -137,6 +230,8 @@
 			scrollSpeed: 100
 		}
 		
+		var activityTimer;
+		
 		var chartsData = {};
 		
 		io = io.connect();
@@ -160,6 +255,8 @@
 		io.on('disconnect', function () {
 			console.log('socket disconnected');
 			
+			$('#pulse').removeClass('active');
+			
 			$.map(chartsData, function(iface) {
 				iface.chart.stop();
 				iface.$chart.addClass('offline');
@@ -181,7 +278,9 @@
 				if (!chartsData[iface].chart) {
 					chartsData[iface].chart = new SmoothieChart({
 						millisPerPixel: settings.scrollSpeed,
-						grid: { strokeStyle:'rgba(0,255,0,0.2)' }
+						grid: { 
+							strokeStyle: 'rgba(0,255,0,0.3)'
+						}
 					});
 				}
 				
@@ -210,6 +309,13 @@
 		});
 		
 		io.on('data', function(data) {
+			
+			$('#pulse').addClass('active');
+			window.clearTimeout(activityTimer);
+			activityTimer = setTimeout(function() {
+				$('#pulse').removeClass('active');
+			}, 2000);
+			
 			var rx = data.rx/1000000;
 			var tx = data.tx/1000000;
 			
@@ -250,7 +356,8 @@
 <body>
 	<header>
 		<h1>Heardbeat</h1>
-		<samp>User-Count: <small id="user_count">-</small></samp>
+		<samp>Online Users: <small id="user_count">-</small></samp>
+		<samp id="pulse"></samp>
 	</header>
 	
 	<main>
