@@ -1,0 +1,221 @@
+
+<!doctype html>
+<html>
+<head>
+<title>Heartbeat</title>
+
+	<style>
+		html {
+			width: 100%;
+			height: 100%;
+			background-color: black;
+			color: white;
+			font-family: monospace;
+		}
+		
+		body {
+			padding: 0px;
+			margin: 0px;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+		
+		header, footer {
+			background-color: #666;
+		}
+		
+		header {
+			display: block;
+			width: 100%;
+			margin: 0px;
+			padding: 0px;
+			border-bottom: 1px solid white;
+		} 
+		
+		header h1 {
+			display: inline-block;
+			width: auto;
+			margin: 0px;
+			padding: 0px;
+		} 
+		
+		main .smoothieGraph .graph.offline {
+			opacity: 0.3;
+		}
+		
+		main .smoothieGraph .interface {
+			margin-bottom: -10px;
+			margin-top: 30px;
+		}
+		
+		main .smoothieGraph .caption {
+			float: right;
+		}
+		
+		
+		footer {
+			position: absolute;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			text-align: center;
+			border-top: 1px solid white;
+			padding: 10px;
+		}
+		
+		footer ul {
+			width: auto;
+			list-style: none;
+			float: right;
+			padding: 0px;
+			margin: 0px;
+		}
+		
+		footer ul li {
+			float: left;
+		}
+		
+		footer ul li:before {
+			content: "|";
+			color: #333;
+			padding: 0px 10px;
+		}
+		
+		footer ul li:first-child:before {
+			content: "";
+		}
+		
+		footer ul li a {
+			color: white;
+		}
+	</style>
+
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
+<script type="text/javascript" src="static/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="static/smoothie/smoothie.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		var chartData = [[],[]];
+		
+		var settings = {
+			scrollSpeed: 100
+		}
+		
+		var chartsData = {};
+		
+		io = io.connect();
+		
+		io.on('error', function(err) {
+			alert("Error: " + err.code + ': ' + err.signal);
+		});
+		
+		io.on('connect_failed', function(){
+			alert('Connection Failed');
+		});
+		
+		io.on('usercount_update', function(user_count){
+			$('#user_count').text(user_count);
+		});
+		
+		io.on('connect', function(){
+			console.log('socket connected');
+		});
+		io.on('disconnect', function () {
+			console.log('socket disconnected');
+			
+			$.map(chartsData, function(iface) {
+				var i = chartsData[iface];
+				i.chart.stop();
+				i.$chart.addClass('offline');
+			});
+		});
+		
+		io.on('initialize', function(data) {
+			$('header h1').text(data.hostname);
+			var ifaces = data.ifaces;
+			
+			$('main').empty();
+				
+			ifaces.forEach(function(iface) {
+				chartsData[iface] = {
+					rx: new TimeSeries(),
+					tx: new TimeSeries()
+				}
+				
+				if (!chartsData[iface].chart) {
+					chartsData[iface].chart = new SmoothieChart({
+						millisPerPixel: settings.scrollSpeed
+					});
+				}
+				
+				if (!chartsData[iface].$chart) {
+					var $chart = $(
+						'<section class="smoothieGraph">' +
+						'	<h2 class="rxtx_' + iface + ' interface">' + iface + '</h2> ' +
+						'	<small class="rxtx_' + iface + ' caption"><span class="value">-</span> <span class="unit">Mbit/s</span></small>' +
+						'	<canvas id="rxtx_' + iface + '" class="graph" width="400" height="200"></canvas>' +
+						'</section>');
+					
+					chartsData[iface].$chart = $chart.find('canvas');
+					$('main').append($chart);
+				}
+				
+				var optionsRx = { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.4)', lineWidth: 2 };
+				var optionsTx = { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 };
+				
+				chartsData[iface].chart.addTimeSeries(chartsData[iface].rx, optionsRx);
+				chartsData[iface].chart.addTimeSeries(chartsData[iface].tx, optionsTx);
+				chartsData[iface].chart.streamTo(chartsData[iface].$chart.get(0), settings.scrollSpeed*15 );
+			});
+			
+			updateWidth();
+		});
+		
+		io.on('data', function(data) {
+			var rx = data.rx/1000000;
+			var tx = data.tx/1000000;
+			
+			chartsData[data.iface].rx.append(data.timestamp, rx);
+			chartsData[data.iface].tx.append(data.timestamp, tx);
+			
+			$('.rxtx_'+data.iface+'.caption .value').text(
+				parseFloat(rx).toFixed(2) + '/' + parseFloat(tx).toFixed(2)
+			);
+		});
+		
+		function updateWidth() {
+			console.log("updateWidth");
+			var $body = $('body');
+			
+			$.map(chartsData, function(iface) {
+				iface.$chart.attr('width', $body.innerWidth());
+				if (iface.chart) {
+					SmoothieChart.prototype.resize.call(iface.chart);
+				}
+			}, this);
+		}
+		$(window).resize(updateWidth);
+	});
+</script>
+</head>
+<body>
+	<header>
+		<h1>Heardbeat</h1>
+		User-Count: <small id="user_count">-</small>
+	</header>
+	
+	<main>
+		<i>waiting for data...</i>
+	</main>
+	
+	<footer>
+		<ul>
+			<li><a href="https://opensource.org/licenses/AGPL-3.0">AGPL-3.0</a> by <a href="https://github.com/mojoaxel">mojoaxel</a></li>
+			<li><a href="https://www.github.com">Source</a></li>
+		</ul>
+	</footer>
+</body>
+</html>
