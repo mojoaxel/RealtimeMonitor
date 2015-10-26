@@ -9,8 +9,8 @@
 			width: 100%;
 			height: 100%;
 			background-color: black;
-			color: white;
-			font-family: monospace;
+			color: rgba(0,255,0,1);
+			font-family: "Courier New", Courier, monospace;
 		}
 		
 		body {
@@ -22,7 +22,9 @@
 		}
 		
 		header, footer {
-			background-color: #666;
+			background-color: black;
+			height: 40px;
+			box-sizing: border-box;
 		}
 		
 		header {
@@ -30,7 +32,7 @@
 			width: 100%;
 			margin: 0px;
 			padding: 0px;
-			border-bottom: 1px solid white;
+			border-bottom: 2px solid green;
 		} 
 		
 		header h1 {
@@ -40,17 +42,45 @@
 			padding: 0px;
 		} 
 		
+		main {
+			overflow-y: scroll;
+			overflow-x: hidden;
+		}
+		
+		main::-webkit-scrollbar {
+			width: 12px;
+		}
+		main::-webkit-scrollbar-track {
+			background-color: rgba(0,255,0,0.2);
+			border-left: 1px solid green;
+		}
+		main::-webkit-scrollbar-thumb {
+			background-color: rgba(0,255,0,0.5);
+		}
+		main::-webkit-scrollbar-thumb:hover {
+			background-color: rgba(0,255,0,0.5);
+		}
+		
 		main .smoothieGraph .graph.offline {
 			opacity: 0.3;
 		}
 		
 		main .smoothieGraph .interface {
 			margin-bottom: -10px;
-			margin-top: 30px;
+			margin-top: 20px;
 		}
 		
 		main .smoothieGraph .caption {
 			float: right;
+			font-weight: bold;
+		}
+		
+		main .smoothieGraph .caption .rx {
+			color: blue;
+		}
+		
+		main .smoothieGraph .caption .tx {
+			color: yellow;
 		}
 		
 		
@@ -60,8 +90,11 @@
 			left: 0px;
 			right: 0px;
 			text-align: center;
-			border-top: 1px solid white;
+			border-top: 2px solid green;
 			padding: 10px;
+			font-size: small;
+			font-weight: bold;
+			color: green;
 		}
 		
 		footer ul {
@@ -78,7 +111,7 @@
 		
 		footer ul li:before {
 			content: "|";
-			color: #333;
+			color: green;
 			padding: 0px 10px;
 		}
 		
@@ -87,7 +120,7 @@
 		}
 		
 		footer ul li a {
-			color: white;
+			color: rgba(0,255,0,1);
 		}
 	</style>
 
@@ -123,13 +156,13 @@
 		io.on('connect', function(){
 			console.log('socket connected');
 		});
+		
 		io.on('disconnect', function () {
 			console.log('socket disconnected');
 			
 			$.map(chartsData, function(iface) {
-				var i = chartsData[iface];
-				i.chart.stop();
-				i.$chart.addClass('offline');
+				iface.chart.stop();
+				iface.$chart.addClass('offline');
 			});
 		});
 		
@@ -147,7 +180,8 @@
 				
 				if (!chartsData[iface].chart) {
 					chartsData[iface].chart = new SmoothieChart({
-						millisPerPixel: settings.scrollSpeed
+						millisPerPixel: settings.scrollSpeed,
+						grid: { strokeStyle:'rgba(0,255,0,0.2)' }
 					});
 				}
 				
@@ -164,7 +198,7 @@
 				}
 				
 				var optionsRx = { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.4)', lineWidth: 2 };
-				var optionsTx = { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 };
+				var optionsTx = { strokeStyle: 'rgba(255, 255, 0, 1)', fillStyle: 'rgba(255, 255, 0, 0.2)', lineWidth: 2 };
 				
 				chartsData[iface].chart.addTimeSeries(chartsData[iface].rx, optionsRx);
 				chartsData[iface].chart.addTimeSeries(chartsData[iface].tx, optionsTx);
@@ -181,21 +215,32 @@
 			chartsData[data.iface].rx.append(data.timestamp, rx);
 			chartsData[data.iface].tx.append(data.timestamp, tx);
 			
-			$('.rxtx_'+data.iface+'.caption .value').text(
-				parseFloat(rx).toFixed(2) + '/' + parseFloat(tx).toFixed(2)
+			$('.rxtx_'+data.iface+'.caption .value').html(
+				'<span class="rx">' + parseFloat(rx).toFixed(2) + '</span>' + 
+				' / ' + 
+				'<span class="tx">' + parseFloat(tx).toFixed(2) + '</span>'
 			);
 		});
 		
 		function updateWidth() {
 			console.log("updateWidth");
 			var $body = $('body');
+			var bodyWidth = $body.innerWidth();
+			var scrollWidth = 12;
 			
 			$.map(chartsData, function(iface) {
-				iface.$chart.attr('width', $body.innerWidth());
+				iface.$chart.attr('width', bodyWidth-scrollWidth);
 				if (iface.chart) {
 					SmoothieChart.prototype.resize.call(iface.chart);
 				}
 			}, this);
+			
+			var bodyHeight = $body.innerHeight();
+			var headerHeight = $('header').innerHeight();
+			var footerHeight = $('footer').innerHeight();
+			var borderHeight = 2;
+			
+			$('main').height(bodyHeight-headerHeight-footerHeight-(2*borderHeight));
 		}
 		$(window).resize(updateWidth);
 	});
@@ -204,7 +249,7 @@
 <body>
 	<header>
 		<h1>Heardbeat</h1>
-		User-Count: <small id="user_count">-</small>
+		<samp>User-Count: <small id="user_count">-</small></samp>
 	</header>
 	
 	<main>
