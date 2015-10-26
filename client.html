@@ -80,7 +80,7 @@
 		}
 		
 		main .smoothieGraph .caption .tx {
-			color: yellow;
+			color: rgba(0,255,0,1);
 		}
 		
 		
@@ -198,10 +198,11 @@
 				}
 				
 				var optionsRx = { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.4)', lineWidth: 2 };
-				var optionsTx = { strokeStyle: 'rgba(255, 255, 0, 1)', fillStyle: 'rgba(255, 255, 0, 0.2)', lineWidth: 2 };
+				var optionsTx = { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 };
 				
 				chartsData[iface].chart.addTimeSeries(chartsData[iface].rx, optionsRx);
 				chartsData[iface].chart.addTimeSeries(chartsData[iface].tx, optionsTx);
+				
 				chartsData[iface].chart.streamTo(chartsData[iface].$chart.get(0), settings.scrollSpeed*15 );
 			});
 			
@@ -216,9 +217,9 @@
 			chartsData[data.iface].tx.append(data.timestamp, tx);
 			
 			$('.rxtx_'+data.iface+'.caption .value').html(
-				'<span class="rx">' + parseFloat(rx).toFixed(2) + '</span>' + 
+				'<span class="rx">rx:' + parseFloat(rx).toFixed(2) + '</span>' + 
 				' / ' + 
-				'<span class="tx">' + parseFloat(tx).toFixed(2) + '</span>'
+				'<span class="tx">tx:' + parseFloat(tx).toFixed(2) + '</span>'
 			);
 		});
 		
