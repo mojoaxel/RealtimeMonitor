@@ -21,8 +21,8 @@ VnStat.prototype.init = function (options) {
 	this._vnstat_process = {};
 
 	//TODO error handling
-	this.io = options.socket;
 	this.settings = options.settings;
+	this.callback = options.callback;
 };
 
 /**
@@ -60,14 +60,14 @@ VnStat.prototype._startVnstat = function(iface) {
 		//   rx:       16 kbit/s    15 p/s          tx:      304 kbit/s    33 p/s
 		var regex_rx = /rx:(.*?)\s(\w?)bit\/s/;		
 		var regex_tx = /tx:(.*?)\s(\w?)bit\/s/;
-		var result_tx = line.match(regex_tx);
 		var result_rx = line.match(regex_rx);
+		var result_tx = line.match(regex_tx);
 		
 		if (result_rx && result_tx) {
 			var rx = parseInt(result_rx[1]) * getFactorByPrefix(result_rx[2]);
 			var tx = parseInt(result_tx[1]) * getFactorByPrefix(result_tx[2]);
 			
-			that.io.broadcast('data', {
+			that.callback('iface', {
 				iface: iface,
 				timestamp: new Date().getTime(),
 				rx: rx,
@@ -96,28 +96,17 @@ VnStat.prototype._stopVnstat = function(iface) {
  * @public
  */
 VnStat.prototype.start = function() {
-	var that = this;
-	child_process.exec('vnstat --iflist', function (err, stdout, stderr){
-		if (err) {
-			console.error("could not read interface list: " + err.code);
-		}
-		
-		var re = /^Available interfaces: (.*?) \n$/gi;
-		var ifaces = re.exec(stdout);
-		
-		if (ifaces && ifaces.length > 1) {
-			ifaces = ifaces[1].split(" ");
-			that.ifaces = _.without(ifaces, 'lo');
-			that.ifaces.forEach(function(iface) {
-				that._startVnstat(iface);
-			});
-			
-			that.io.broadcast('initialize', {
-				hostname: os.hostname(),
-				ifaces: that.ifaces
-			});
-		}
+	this.ifaces = _.keys(os.networkInterfaces());
+	this.ifaces = _.difference(this.ifaces, this.settings.get('ifaces')) || [];
+	
+	this.callback('initialize', {
+		hostname: os.hostname(),
+		ifaces: this.ifaces
 	});
+	
+	this.ifaces.forEach(function(iface) {
+		this._startVnstat(iface);
+	}, this);
 };
 
 /**

@@ -1,8 +1,53 @@
-
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>Heartbeat</title>
+	<meta charset="utf-8">
+	<title>Realtime Server Monitor</title>
+	
+	<meta name="description" content="Realtime Server Monitor">
+	<meta name="author" content="Alexander Wunschik (dev@wunschik.net)">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=0.7 user-scalable=no">
+	<meta name="apple-mobile-web-app-title" content="Realtime Server Monitor">
+	<meta name="application-name" content="Realtime Server Monitor">
+	
+	<meta name="msapplication-config" content="/static/browserconfig.xml">
+	<meta name="msapplication-TileImage" content="/static/icons/ms-icon-144x144.png">
+	<meta name="msapplication-TileColor" content="#000000">
+	<meta name="theme-color" content="#000000">
+	
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="#000000" />
+	<meta name="mobile-web-app-capable" content="yes">
+	<link rel="manifest" href="/static/manifest.json">
+	<link rel="apple-touch-icon" sizes="57x57" href="/static/icons/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/static/icons/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/static/icons/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/static/icons/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/static/icons/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/static/icons/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/static/icons/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/static/icons/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="/static/icons/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="/static/icons/android-icon-192x192.png">
+
+	<!-- 320x460 - iPhones bis einschließlich 3GS -->
+	<!-- <link href="splash/apple-touch-startup-image-320x460.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image"> -->
+	<!-- 640x920 - iPhone (Retina) -->
+	<!-- <link href="splash/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image"> -->
+	<!-- 640x1096 - iPhone 5 -->
+	<!-- <link href="splash/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image"> -->
+	<!-- 768x1004 - iPad (portrait) -->
+	<!-- <link href="splash/apple-touch-startup-image-768x1004.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image"> -->
+	<!-- 748x1024 - iPad (landscape) -->
+	<!-- <link href="splash/apple-touch-startup-image-748x1024.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image"> -->
+	<!-- 1536x2008 - iPad (Retina, portrait) -->
+	<!-- <link href="splash/apple-touch-startup-image-1536x2008.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image"> -->
+	<!-- 1496x2048 - iPad (Retina, landscape) -->
+	<!-- <link href="splash/apple-touch-startup-image-1496x2048.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" /> -->
 
 	<style>
 		html {
@@ -39,7 +84,7 @@
 			display: inline-block;
 			width: auto;
 			margin: 0px;
-			padding: 0px;
+			padding: 0px 10px;
 		}
 		
 		header #pulse {
@@ -60,12 +105,16 @@
 		
 		header #pulse:before {
 			content: "inactive";
-			margin-left: -80px;
+			position: absolute;
+			margin-left: -70px;
+			margin-top: 8px;
 		}
 		
 		header #pulse.active:before {
 			content: "active";
-			margin-left: -60px;
+			position: absolute;
+			margin-left: -55px;
+			margin-top: 8px;
 		}
 		
 		#pulse.active {
@@ -141,11 +190,11 @@
 		}
 		
 		main::-webkit-scrollbar {
-			width: 12px;
+			width: 4px;
 		}
 		main::-webkit-scrollbar-track {
 			background-color: rgba(0,255,0,0.2);
-			border-left: 1px solid green;
+			border-left: 2px solid green;
 		}
 		main::-webkit-scrollbar-thumb {
 			background-color: rgba(0,255,0,0.5);
@@ -161,15 +210,17 @@
 		main .smoothieGraph .interface {
 			margin-bottom: -10px;
 			margin-top: 20px;
+			padding-left: 10px;
 		}
 		
 		main .smoothieGraph .caption {
 			float: right;
 			font-weight: bold;
+			padding-right: 5px;
 		}
 		
 		main .smoothieGraph .caption .rx {
-			color: blue;
+			color: rgba(0,100,255,1);
 		}
 		
 		main .smoothieGraph .caption .tx {
@@ -219,8 +270,8 @@
 
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
-<script type="text/javascript" src="static/jquery/dist/jquery.min.js"></script>
-<script type="text/javascript" src="static/smoothie/smoothie.js"></script>
+<script type="text/javascript" src="bower/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="bower/smoothie/smoothie.js"></script>
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -278,8 +329,14 @@
 				if (!chartsData[iface].chart) {
 					chartsData[iface].chart = new SmoothieChart({
 						millisPerPixel: settings.scrollSpeed,
+						minValue: 0,
 						grid: { 
 							strokeStyle: 'rgba(0,255,0,0.3)'
+						},
+						labels: {
+							fillStyle: 'rgba(0,255,0,1)',
+							fontSize: 12,
+							precision: 2
 						}
 					});
 				}
@@ -308,7 +365,7 @@
 			updateWidth();
 		});
 		
-		io.on('data', function(data) {
+		io.on('iface', function(data) {
 			
 			$('#pulse').addClass('active');
 			window.clearTimeout(activityTimer);
@@ -323,8 +380,7 @@
 			chartsData[data.iface].tx.append(data.timestamp, tx);
 			
 			$('.rxtx_'+data.iface+'.caption .value').html(
-				'<span class="rx">rx:' + parseFloat(rx).toFixed(2) + '</span>' + 
-				' / ' + 
+				'<span class="rx">rx:' + parseFloat(rx).toFixed(2) + '</span> ' +
 				'<span class="tx">tx:' + parseFloat(tx).toFixed(2) + '</span>'
 			);
 		});
@@ -333,7 +389,7 @@
 			console.log("updateWidth");
 			var $body = $('body');
 			var bodyWidth = $body.innerWidth();
-			var scrollWidth = 12;
+			var scrollWidth = 6;
 			
 			$.map(chartsData, function(iface) {
 				iface.$chart.attr('width', bodyWidth-scrollWidth);
@@ -367,7 +423,7 @@
 	<footer>
 		<ul>
 			<li><a href="https://opensource.org/licenses/AGPL-3.0">AGPL-3.0</a> by <a href="https://github.com/mojoaxel">mojoaxel</a></li>
-			<li><a href="https://www.github.com">Source</a></li>
+			<li><a href="https://github.com/mojoaxel/RealtimeMonitor">Source</a></li>
 		</ul>
 	</footer>
 </body>
