@@ -203,6 +203,10 @@
 			background-color: rgba(0,255,0,0.5);
 		}
 		
+		main .smoothieGraph .cpu {
+			color: yellow;
+		}
+		
 		main .smoothieGraph .graph.offline {
 			opacity: 0.3;
 		}
@@ -316,18 +320,59 @@
 		
 		io.on('initialize', function(data) {
 			$('header h1').text(data.hostname);
-			var ifaces = data.ifaces;
-			
 			$('main').empty();
+			
+			function createCPUChart(type, unit) {
+				chartsData.cpu = {
+					data: new TimeSeries()
+				}
 				
-			ifaces.forEach(function(iface) {
-				chartsData[iface] = {
+				if (!chartsData.cpu.chart) {
+					chartsData.cpu.chart = new SmoothieChart({
+						millisPerPixel: settings.scrollSpeed,
+						minValue: 0,
+						//maxValue: 100,
+						grid: { 
+							strokeStyle: 'rgba(0,255,0,0.3)'
+						},
+						labels: {
+							fillStyle: 'rgba(255,255,0,1)',
+							fontSize: 12,
+							precision: 2
+						}
+					});
+				}
+				
+				if (!chartsData.cpu.$chart) {
+					var $chart = $(
+						'<section class="smoothieGraph ' + type + '">' +
+						'	<h2 class="' + type + ' interface">' + type + '</h2> ' +
+						'	<small class="' + type + ' caption"><span class="value">-</span> <span class="unit">'+unit+'</span></small>' +
+						'	<canvas id="' + type + '" class="graph" width="400" height="200"></canvas>' +
+						'</section>');
+					
+					chartsData.cpu.$chart = $chart.find('canvas');
+					$('main').append($chart);
+				}
+				
+				var options = { strokeStyle: 'rgba(255, 255, 0, 1)', fillStyle: 'rgba(255, 255, 0, 0.1)', lineWidth: 2 };
+				
+				chartsData.cpu.chart.addTimeSeries(chartsData.cpu.data, options);
+				
+				chartsData.cpu.chart.streamTo(chartsData.cpu.$chart.get(0), settings.scrollSpeed*15 );
+			}
+			
+			// CPU chart
+			createCPUChart('cpu', "%");
+			
+			function createIFaceChart(type, unit) {
+				chartsData[type] = {
 					rx: new TimeSeries(),
 					tx: new TimeSeries()
 				}
 				
-				if (!chartsData[iface].chart) {
-					chartsData[iface].chart = new SmoothieChart({
+				if (!chartsData[type].chart) {
+					chartsData[type].chart = new SmoothieChart({
 						millisPerPixel: settings.scrollSpeed,
 						minValue: 0,
 						grid: { 
@@ -341,28 +386,51 @@
 					});
 				}
 				
-				if (!chartsData[iface].$chart) {
+				if (!chartsData[type].$chart) {
 					var $chart = $(
 						'<section class="smoothieGraph">' +
-						'	<h2 class="rxtx_' + iface + ' interface">' + iface + '</h2> ' +
-						'	<small class="rxtx_' + iface + ' caption"><span class="value">-</span> <span class="unit">Mbit/s</span></small>' +
-						'	<canvas id="rxtx_' + iface + '" class="graph" width="400" height="200"></canvas>' +
+						'	<h2 class="' + type + ' interface">' + type + '</h2> ' +
+						'	<small class="' + type + ' caption"><span class="value">-</span> <span class="unit">'+unit+'</span></small>' +
+						'	<canvas id="' + type + '" class="graph" width="400" height="200"></canvas>' +
 						'</section>');
 					
-					chartsData[iface].$chart = $chart.find('canvas');
+					chartsData[type].$chart = $chart.find('canvas');
 					$('main').append($chart);
 				}
 				
 				var optionsRx = { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.4)', lineWidth: 2 };
 				var optionsTx = { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 };
 				
-				chartsData[iface].chart.addTimeSeries(chartsData[iface].rx, optionsRx);
-				chartsData[iface].chart.addTimeSeries(chartsData[iface].tx, optionsTx);
+				chartsData[type].chart.addTimeSeries(chartsData[type].rx, optionsRx);
+				chartsData[type].chart.addTimeSeries(chartsData[type].tx, optionsTx);
 				
-				chartsData[iface].chart.streamTo(chartsData[iface].$chart.get(0), settings.scrollSpeed*15 );
+				chartsData[type].chart.streamTo(chartsData[type].$chart.get(0), settings.scrollSpeed*15 );
+			}
+			
+			// IFaces charts
+			var ifaces = data.ifaces;
+			ifaces.forEach(function(iface) {
+				createIFaceChart(iface, "Mbit/s");
 			});
 			
 			updateWidth();
+		});
+		
+		io.on('cpu', function(data) {
+			
+			$('#pulse').addClass('active');
+			window.clearTimeout(activityTimer);
+			activityTimer = setTimeout(function() {
+				$('#pulse').removeClass('active');
+			}, 2000);
+			
+			var idle = data.load;
+			
+			chartsData.cpu.data.append(data.timestamp, idle);
+			
+			$('.cpu.caption .value').html(
+				'<span class="load">load:' + parseFloat(idle).toFixed(2) + '</span> '
+			);
 		});
 		
 		io.on('iface', function(data) {
@@ -379,7 +447,7 @@
 			chartsData[data.iface].rx.append(data.timestamp, rx);
 			chartsData[data.iface].tx.append(data.timestamp, tx);
 			
-			$('.rxtx_'+data.iface+'.caption .value').html(
+			$('.'+data.iface+'.caption .value').html(
 				'<span class="rx">rx:' + parseFloat(rx).toFixed(2) + '</span> ' +
 				'<span class="tx">tx:' + parseFloat(tx).toFixed(2) + '</span>'
 			);

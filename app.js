@@ -7,29 +7,42 @@ var app = express().http().io();
 var settings = require('nconf');
 settings.argv().env().file({ file: './settings.json' });
 
-var vnstat_callback = function(type, data) {
+var socket_callback = function(type, data) {
 	app.io.broadcast(type, data);
 };
 
 var VnStat = require('./VnStat.js'); 
 var vnstat = new VnStat({
 	settings: settings,
-	callback: vnstat_callback
+	callback: socket_callback
+});
+
+var CPU = require('./CPU.js'); 
+var cpu = new CPU({
+	settings: settings,
+	callback: socket_callback
 });
 
 
 var user_count = 0;
 app.io.sockets.on('connection', function(socket) {
+	
 	user_count++;
 	console.log("user connected: user_count=", user_count);
+	
 	app.io.broadcast('usercount_update', user_count);
+	
 	vnstat.start();
+	cpu.start();
 	
 	socket.on('disconnect', function() {
 		user_count--;
 		console.log("user connected: user_count=", user_count);
+		
 		app.io.broadcast('usercount_update', user_count);
+		
 		vnstat.stop();
+		cpu.stop();
 	});
 });
 
