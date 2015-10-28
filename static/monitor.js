@@ -201,11 +201,11 @@ $(document).ready(function() {
 	io.on('mem', function(data) {
 		pulse();
 		
-		var perFree = data.perFree*100;
-		chartsData[data.type].data.append(data.timestamp, perFree);
+		var perUsed = (1-data.perFree)*100;
+		chartsData[data.type].data.append(data.timestamp, perUsed);
 		
 		$('.'+data.type+'.caption .value').html(
-			'<span class="free">free:' + parseFloat(perFree).toFixed(2) + '</span> '
+			'<span class="used">used:' + parseFloat(perUsed).toFixed(2) + '</span> '
 		);
 	});
 	
