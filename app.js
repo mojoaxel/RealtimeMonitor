@@ -25,6 +25,7 @@ var cpu = new CPU({
 
 
 var user_count = 0;
+var isRunning = false;
 app.io.sockets.on('connection', function(socket) {
 	
 	user_count++;
@@ -32,8 +33,11 @@ app.io.sockets.on('connection', function(socket) {
 	
 	app.io.broadcast('usercount_update', user_count);
 	
-	vnstat.start();
-	cpu.start();
+	if (!isRunning) {
+		vnstat.start();
+		cpu.start();
+		isRunning = true;
+	}
 	
 	socket.on('disconnect', function() {
 		user_count--;
@@ -41,8 +45,11 @@ app.io.sockets.on('connection', function(socket) {
 		
 		app.io.broadcast('usercount_update', user_count);
 		
-		vnstat.stop();
-		cpu.stop();
+		if (isRunning) {
+			vnstat.stop();
+			cpu.stop();
+			isRunning = false;
+		}
 	});
 });
 

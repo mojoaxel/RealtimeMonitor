@@ -1,4 +1,4 @@
-var os = require("os");
+var os = require("os-utils");
 
 var CPU = module.exports = function(options) {
 	this.init(options || {});
@@ -19,13 +19,15 @@ CPU.prototype.init = function (options) {
  */
 CPU.prototype.start = function() {
 	var that = this;
-	this.interval = setInterval(function(){ 
-		that.callback('cpu', {
-			type: 'cpu',
-			timestamp: new Date().getTime(),
-			load: os.loadavg()[0]
+	this.interval = setInterval(function(){
+		os.cpuUsage(function(load) {
+			that.callback('cpu', {
+				type: 'cpu',
+				timestamp: new Date().getTime(),
+				load: load
+			});
 		});
-	}, 4500);
+	}, 1000);
 };
 
 /**
