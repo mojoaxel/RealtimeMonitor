@@ -1,13 +1,13 @@
 var os = require("os-utils");
 
-var CPU = module.exports = function(options) {
+var cpu = module.exports = function(options) {
 	this.init(options || {});
 };
 
 /**
  * @public
  */
-CPU.prototype.init = function (options) {
+cpu.prototype.init = function (options) {
 	options = options || {};
 	
 	this.settings = options.settings;
@@ -17,7 +17,7 @@ CPU.prototype.init = function (options) {
 /**
  * @public
  */
-CPU.prototype.start = function() {
+cpu.prototype.start = function() {
 	var that = this;
 	this.interval = setInterval(function(){
 		os.cpuUsage(function(load) {
@@ -33,6 +33,6 @@ CPU.prototype.start = function() {
 /**
  * @public
  */
-CPU.prototype.stop =  function() {
+cpu.prototype.stop =  function() {
 	clearInterval(this.interval);
 };

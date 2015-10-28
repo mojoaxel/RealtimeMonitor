@@ -7,14 +7,14 @@ var decoder = new StringDecoder('utf8');
 
 var child_process = require('child_process');
 
-var VnStat = module.exports = function(options) {
+var vnstat = module.exports = function(options) {
 	this.init(options || {});
 };
 
 /**
  * @public
  */
-VnStat.prototype.init = function (options) {
+vnstat.prototype.init = function (options) {
 	options = options || {};
 	
 	this.ifaces = [];
@@ -28,7 +28,7 @@ VnStat.prototype.init = function (options) {
 /**
  * @private
  */
-VnStat.prototype._startVnstat = function(iface) {
+vnstat.prototype._startVnstat = function(iface) {
 	var that = this;
 	
 	if (this._vnstat_process[iface]) {
@@ -68,7 +68,7 @@ VnStat.prototype._startVnstat = function(iface) {
 			var tx = parseInt(result_tx[1]) * getFactorByPrefix(result_tx[2]);
 			
 			that.callback('iface', {
-				iface: iface,
+				type: iface,
 				timestamp: new Date().getTime(),
 				rx: rx,
 				tx: tx,
@@ -83,7 +83,7 @@ VnStat.prototype._startVnstat = function(iface) {
 /**
  * @private
  */
-VnStat.prototype._stopVnstat = function(iface) {
+vnstat.prototype._stopVnstat = function(iface) {
 	if (this._vnstat_process[iface]) {
 		this._vnstat_process[iface].kill('SIGINT');
 		delete this._vnstat_process[iface];
@@ -95,7 +95,7 @@ VnStat.prototype._stopVnstat = function(iface) {
 /**
  * @public
  */
-VnStat.prototype.start = function() {
+vnstat.prototype.start = function() {
 	this.ifaces = _.keys(os.networkInterfaces());
 	this.ifaces = _.difference(this.ifaces, this.settings.get('ifaces')) || [];
 	
@@ -112,7 +112,7 @@ VnStat.prototype.start = function() {
 /**
  * @public
  */
-VnStat.prototype.stop =  function() {
+vnstat.prototype.stop =  function() {
 	this.ifaces.forEach(function(iface) {
 		this._stopVnstat(iface);
 	}, this);

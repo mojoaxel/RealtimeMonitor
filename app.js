@@ -11,18 +11,23 @@ var socket_callback = function(type, data) {
 	app.io.broadcast(type, data);
 };
 
-var VnStat = require('./VnStat.js'); 
-var vnstat = new VnStat({
+var VNSTAT = require('./plugins/vnstat.js'); 
+var vnstat = new VNSTAT({
 	settings: settings,
 	callback: socket_callback
 });
 
-var CPU = require('./CPU.js'); 
+var CPU = require('./plugins/cpu.js'); 
 var cpu = new CPU({
 	settings: settings,
 	callback: socket_callback
 });
 
+var MEM = require('./plugins/mem.js'); 
+var mem = new MEM({
+	settings: settings,
+	callback: socket_callback
+});
 
 var user_count = 0;
 var isRunning = false;
@@ -36,6 +41,7 @@ app.io.sockets.on('connection', function(socket) {
 	if (!isRunning) {
 		vnstat.start();
 		cpu.start();
+		mem.start();
 		isRunning = true;
 	}
 	
@@ -48,6 +54,7 @@ app.io.sockets.on('connection', function(socket) {
 		if (isRunning) {
 			vnstat.stop();
 			cpu.stop();
+			mem.stop();
 			isRunning = false;
 		}
 	});
