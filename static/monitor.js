@@ -194,7 +194,7 @@ $(document).ready(function() {
 		chartsData[data.type].data.append(data.timestamp, data.load);
 		
 		$('.'+data.type+'.caption .value').html(
-			'<span class="load">load:' + parseFloat(data.load).toFixed(2) + '</span> '
+			'<span class="load">load:' + parseFloat(data.load*100).toFixed(2) + '</span> '
 		);
 	});
 	
