@@ -1,0 +1,224 @@
+html {
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	color: rgba(0,255,0,1);
+	font-family: "Courier New", Courier, monospace;
+}
+
+body {
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+header, footer {
+	background-color: black;
+	height: 40px;
+	box-sizing: border-box;
+}
+
+header {
+	display: block;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	border-bottom: 2px solid green;
+}
+
+header h1 {
+	display: inline-block;
+	width: auto;
+	margin: 0px;
+	padding: 0px 10px;
+}
+
+header #pulse {
+	float: right;
+	content: "";
+	display: block;
+	position: absolute;
+	top: 8px;
+	right: 11px;
+	width: 20px;
+	height: 20px;
+	border: 2px solid;
+	border-radius: 20px;
+	
+	color: rgba(255,0,0, 0.6);
+	background-color: rgba(255,0,0, 0.4);
+}
+
+header #pulse:before {
+	content: "inactive";
+	position: absolute;
+	margin-left: -70px;
+	margin-top: 8px;
+}
+
+header #pulse.active:before {
+	content: "active";
+	position: absolute;
+	margin-left: -55px;
+	margin-top: 8px;
+}
+
+#pulse.active {
+	-webkit-animation: pulse1 1s linear infinite;
+	-moz-animation: pulse1 1s linear infinite;
+	-ms-animation: pulse1 1s linear infinite;
+	animation: pulse1 1s linear infinite;
+}
+
+@keyframes "pulse1" {
+	0% {
+		color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.8);
+	}
+	90% {
+		color: rgba(0,255,0, 0.3);
+		background-color: rgba(0,255,0, 0.3);
+	}
+	100% {
+		color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.8);
+	}
+}
+
+@-moz-keyframes pulse1 {
+	0% {
+		color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.8);
+	}
+	90% {
+		color: rgba(0,255,0, 0.3);
+		background-color: rgba(0,255,0, 0.3);
+	}
+	100% {
+		color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.8);
+	}
+}
+
+@-webkit-keyframes "pulse1" {
+	0% {
+		color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.8);
+	}
+	90% {
+		color: rgba(0,255,0, 0.3);
+		background-color: rgba(0,255,0, 0.3);
+	}
+	100% {
+		color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.8);
+	}
+}
+
+@-ms-keyframes "pulse1" {
+	0% {
+		color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.8);
+	}
+	90% {
+		color: rgba(0,255,0, 0.3);
+		background-color: rgba(0,255,0, 0.3);
+	}
+	100% {
+		color: rgba(0,255,0, 1);
+		background-color: rgba(0,255,0, 0.8);
+	}
+}
+
+main {
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+main::-webkit-scrollbar {
+	width: 4px;
+}
+main::-webkit-scrollbar-track {
+	background-color: rgba(0,255,0,0.2);
+	border-left: 2px solid green;
+}
+main::-webkit-scrollbar-thumb {
+	background-color: rgba(0,255,0,0.5);
+}
+main::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0,255,0,0.5);
+}
+
+main .smoothieGraph .cpu {
+	color: yellow;
+}
+
+main .smoothieGraph .mem {
+	color: red;
+}
+
+main .smoothieGraph .graph.offline {
+	opacity: 0.3;
+}
+
+main .smoothieGraph .interface {
+	margin-bottom: -10px;
+	margin-top: 20px;
+	padding-left: 10px;
+}
+
+main .smoothieGraph .caption {
+	float: right;
+	font-weight: bold;
+	padding-right: 5px;
+}
+
+main .smoothieGraph .caption .rx {
+	color: rgba(0,100,255,1);
+}
+
+main .smoothieGraph .caption .tx {
+	color: rgba(0,255,0,1);
+}
+
+
+footer {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	text-align: center;
+	border-top: 2px solid green;
+	padding: 10px;
+	font-size: small;
+	font-weight: bold;
+	color: green;
+}
+
+footer ul {
+	width: auto;
+	list-style: none;
+	float: right;
+	padding: 0px;
+	margin: 0px;
+}
+
+footer ul li {
+	float: left;
+}
+
+footer ul li:before {
+	content: "|";
+	color: green;
+	padding: 0px 10px;
+}
+
+footer ul li:first-child:before {
+	content: "";
+}
+
+footer ul li a {
+	color: rgba(0,255,0,1);
+}
