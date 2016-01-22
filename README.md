@@ -22,6 +22,10 @@ bower install
 ```
 node app.js
 ```
+oder
+```
+nodemon app.js
+```
 
 ## License
 
