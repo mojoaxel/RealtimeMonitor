@@ -17,6 +17,13 @@ npm install
 bower install
 ``` 
 
+## Setings
+```
+cp settings_example.json settings.json
+```
+* **port**: start webserver in this port
+* **ifaces**: filter the given interfaces.
+
 ## Run
 
 ```
