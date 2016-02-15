@@ -1,4 +1,5 @@
-var os = require("os-utils");
+var free = require('freem');
+var _ = require('lodash');
 
 var mem = module.exports = function(options) {
 	this.init(options || {});
@@ -9,7 +10,7 @@ var mem = module.exports = function(options) {
  */
 mem.prototype.init = function (options) {
 	options = options || {};
-	
+
 	this.settings = options.settings;
 	this.callback = options.callback;
 };
@@ -20,15 +21,22 @@ mem.prototype.init = function (options) {
 mem.prototype.start = function() {
 	var that = this;
 	this.interval = setInterval(function(){
-		that.callback('mem', {
-			type: 'mem',
-			timestamp: new Date().getTime(),
-			total: os.totalmem(),
-			free: os.freemem(),
-			perFree: os.freememPercentage(),
-			used: os.totalmem()-os.freemem()
+		free(function(err, list) {
+			var mem = _.find(list, { "type": "Mem:"});
+			var buffers = _.find(list, { "type": "-/+ buffers/cache:"});
+
+			that.callback('mem', {
+				type: 'mem',
+				timestamp: new Date().getTime(),
+				total: mem.total,
+				free: buffers.free,
+				perFree: buffers.free/mem.total,
+				used: buffers.used
+			});
 		});
-	}, 1000);
+
+
+	}, 500);
 };
 
 /**
