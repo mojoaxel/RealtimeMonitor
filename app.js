@@ -11,19 +11,19 @@ var socket_callback = function(type, data) {
 	app.io.broadcast(type, data);
 };
 
-var VNSTAT = require('./plugins/vnstat.js'); 
+var VNSTAT = require('./plugins/vnstat.js');
 var vnstat = new VNSTAT({
 	settings: settings,
 	callback: socket_callback
 });
 
-var CPU = require('./plugins/cpu.js'); 
+var CPU = require('./plugins/cpu.js');
 var cpu = new CPU({
 	settings: settings,
 	callback: socket_callback
 });
 
-var MEM = require('./plugins/mem.js'); 
+var MEM = require('./plugins/mem.js');
 var mem = new MEM({
 	settings: settings,
 	callback: socket_callback
@@ -32,25 +32,25 @@ var mem = new MEM({
 var user_count = 0;
 var isRunning = false;
 app.io.sockets.on('connection', function(socket) {
-	
+
 	user_count++;
 	console.log("user connected: user_count=", user_count);
-	
+
 	app.io.broadcast('usercount_update', user_count);
-	
+
 	if (!isRunning) {
 		vnstat.start();
 		cpu.start();
 		mem.start();
 		isRunning = true;
 	}
-	
+
 	socket.on('disconnect', function() {
 		user_count--;
 		console.log("user connected: user_count=", user_count);
-		
+
 		app.io.broadcast('usercount_update', user_count);
-		
+
 		if (isRunning) {
 			vnstat.stop();
 			cpu.stop();
@@ -64,7 +64,7 @@ app.use('/bower',  express.static(path.join(__dirname, '/bower_components')));
 app.use('/static', express.static(path.join(__dirname, '/static')));
 
 app.get('/', function(req, res) {
-	res.sendfile(__dirname + '/client.html');
+	res.sendfile(__dirname + '/static/client.html');
 });
 
 app.listen(settings.get('port'));
