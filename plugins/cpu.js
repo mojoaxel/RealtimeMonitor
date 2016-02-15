@@ -9,7 +9,7 @@ var cpu = module.exports = function(options) {
  */
 cpu.prototype.init = function (options) {
 	options = options || {};
-	
+
 	this.settings = options.settings;
 	this.callback = options.callback;
 };
@@ -27,7 +27,7 @@ cpu.prototype.start = function() {
 				load: load
 			});
 		});
-	}, 1000);
+	}, 500);
 };
 
 /**

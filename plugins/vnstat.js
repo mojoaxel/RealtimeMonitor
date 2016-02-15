@@ -16,7 +16,7 @@ var vnstat = module.exports = function(options) {
  */
 vnstat.prototype.init = function (options) {
 	options = options || {};
-	
+
 	this.ifaces = [];
 	this._vnstat_process = {};
 
@@ -30,11 +30,11 @@ vnstat.prototype.init = function (options) {
  */
 vnstat.prototype._startVnstat = function(iface) {
 	var that = this;
-	
+
 	if (this._vnstat_process[iface]) {
 		return false;
 	}
-	
+
 	this._vnstat_process[iface] = child_process.spawn('vnstat', ['-i',iface, '--live','0']);
 	this._vnstat_process[iface].stdout.on('data', function(data) {
 		var line = decoder.write(data);
@@ -56,17 +56,17 @@ vnstat.prototype._startVnstat = function(iface) {
 				default  : return 1;
 			}
 		}
-		
+
 		//   rx:       16 kbit/s    15 p/s          tx:      304 kbit/s    33 p/s
-		var regex_rx = /rx:(.*?)\s(\w?)bit\/s/;		
+		var regex_rx = /rx:(.*?)\s(\w?)bit\/s/;
 		var regex_tx = /tx:(.*?)\s(\w?)bit\/s/;
 		var result_rx = line.match(regex_rx);
 		var result_tx = line.match(regex_tx);
-		
+
 		if (result_rx && result_tx) {
 			var rx = parseInt(result_rx[1]) * getFactorByPrefix(result_rx[2]);
 			var tx = parseInt(result_tx[1]) * getFactorByPrefix(result_tx[2]);
-			
+
 			that.callback('iface', {
 				type: iface,
 				timestamp: new Date().getTime(),
@@ -75,7 +75,7 @@ vnstat.prototype._startVnstat = function(iface) {
 				unit: 'bit/s'
 			});
 		}
-		
+
 		return true;
 	});
 };
@@ -98,12 +98,12 @@ vnstat.prototype._stopVnstat = function(iface) {
 vnstat.prototype.start = function() {
 	this.ifaces = _.keys(os.networkInterfaces());
 	this.ifaces = _.difference(this.ifaces, this.settings.get('ifaces')) || [];
-	
+
 	this.callback('initialize', {
 		hostname: os.hostname(),
 		ifaces: this.ifaces
 	});
-	
+
 	this.ifaces.forEach(function(iface) {
 		this._startVnstat(iface);
 	}, this);
