@@ -22,6 +22,12 @@
     "lodash": "^4.3.0",
     "lodash-node": "~3.10.1",
     "nconf": "~0.8.2",
-    "os-utils": "~0.0.14"
-  }
+    "os-utils": "~0.0.14",
+    "snyk": "^1.21.2"
+  },
+  "scripts": {
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }

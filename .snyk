@@ -1,0 +1,12 @@
+version: v1.5.0
+ignore: {}
+patch:
+  'npm:negotiator:20160616':
+    - express.io > express > connect > negotiator:
+        patched: '2016-12-07T22:08:37.673Z'
+  'npm:qs:20140806-1':
+    - express.io > express > connect > qs:
+        patched: '2016-12-07T22:08:37.673Z'
+  'npm:ws:20160104':
+    - express.io > socket.io > socket.io-client > ws:
+        patched: '2016-12-07T22:08:37.673Z'
