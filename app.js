@@ -1,4 +1,4 @@
-var _ = require('lodash-node');
+var _ = require('lodash');
 var path = require('path');
 var os = require("os");
 var express = require('express.io');
@@ -35,7 +35,6 @@ app.io.sockets.on('connection', function(socket) {
 
 	user_count++;
 	console.log("user connected: user_count=", user_count);
-
 	app.io.broadcast('usercount_update', user_count);
 
 	if (!isRunning) {
@@ -60,11 +59,16 @@ app.io.sockets.on('connection', function(socket) {
 	});
 });
 
+
 app.use('/bower',  express.static(path.join(__dirname, '/bower_components')));
 app.use('/static', express.static(path.join(__dirname, '/static')));
 
 app.get('/', function(req, res) {
+	console.log("request");
 	res.sendfile(__dirname + '/static/client.html');
 });
 
-app.listen(settings.get('port'));
+app.listen(settings.get('port'), function() {
+	console.log("listening port ", 8083);
+});
+

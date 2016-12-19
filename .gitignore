@@ -2,3 +2,5 @@
 /node_modules
 /settings.json
 /.project
+.app.js.swp
+plugins/.mem.js.swp

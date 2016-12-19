@@ -23,15 +23,14 @@ mem.prototype.start = function() {
 	this.interval = setInterval(function(){
 		free(function(err, list) {
 			var mem = _.find(list, { "type": "Mem:"});
-			var buffers = _.find(list, { "type": "-/+ buffers/cache:"});
-
+			
 			that.callback('mem', {
 				type: 'mem',
 				timestamp: new Date().getTime(),
 				total: mem.total,
-				free: buffers.free,
-				perFree: buffers.free/mem.total,
-				used: buffers.used
+				free: mem.free,
+				perFree: mem.free/mem.total,
+				used: mem.used
 			});
 		});
 
