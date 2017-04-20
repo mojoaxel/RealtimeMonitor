@@ -14,7 +14,7 @@
     "url": "https://github.com/mojoaxel/RealtimeMonitor/issues"
   },
   "dependencies": {
-    "connect": "^3.5.0",
+    "connect": "^3.6.1",
     "express.io": "~1.1.13",
     "freem": "github:mojoaxel/freem",
     "lodash": "^4.3.0",
