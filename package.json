@@ -17,7 +17,7 @@
     "connect": "^3.5.0",
     "express.io": "~1.1.13",
     "freem": "github:mojoaxel/freem",
-    "lodash": "^4.3.0",
+    "lodash": "^4.17.9",
     "nconf": "~0.10.0",
     "os-utils": "~0.0.14",
     "snyk": "^1.36.2"
