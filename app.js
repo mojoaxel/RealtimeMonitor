@@ -60,7 +60,7 @@ app.io.sockets.on('connection', function(socket) {
 });
 
 
-app.use('/bower',  express.static(path.join(__dirname, '/bower_components')));
+app.use('/vendor',  express.static(path.join(__dirname, '/node_modules')));
 app.use('/static', express.static(path.join(__dirname, '/static')));
 
 app.get('/', function(req, res) {
@@ -69,6 +69,6 @@ app.get('/', function(req, res) {
 });
 
 app.listen(settings.get('port'), function() {
-	console.log("listening port ", 8083);
+	console.log("listening port ", settings.get('port'));
 });
 

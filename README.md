@@ -1,20 +1,18 @@
 # RealtimeMonitor
-Realtime Server Monitor
+
+![image](https://user-images.githubusercontent.com/600565/82145106-c5b0ff80-9848-11ea-9043-ef1362be8f70.png)
 
 ## Setup
 
 ### Requirements
 
-```
-npm node 
-vnstat
-```
+* [`node` and `npm`](https://nodejs.org/)
+* [vnstat](https://linux.die.net/man/1/vnstat)
 
 ### Setup
 
 ```
 npm install
-bower install
 ``` 
 
 ## Setings
