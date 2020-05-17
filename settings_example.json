@@ -1,4 +1,8 @@
 {
 	"port": 8083,
-	"ifaces": ["lo"]
+	"plugins": [
+		["./plugins/vnstat.js", { "ifaceFilter": ["lo"] }],
+		["./plugins/cpu.js", {}],
+		["./plugins/mem.js", {}]
+	]
 }

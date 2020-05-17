@@ -11,23 +11,25 @@ var socket_callback = function(type, data) {
 	app.io.broadcast(type, data);
 };
 
-var VNSTAT = require('./plugins/vnstat.js');
-var vnstat = new VNSTAT({
-	settings: settings,
-	callback: socket_callback
-});
+function loadPlugins(settings, socket_callback) {
+	var plugins = [];
+	
+	settings.get('plugins').forEach(function(pluginSettings) {
+		var pluginFile = pluginSettings[0];
+		var pluginOptions = pluginSettings[1];
+		
+		var PLUGIN = require(pluginFile);
+		var plugin = new PLUGIN(Object.assign({
+			settings,
+			callback: socket_callback
+		}, pluginOptions));
+		plugins.push(plugin);
+	});
 
-var CPU = require('./plugins/cpu.js');
-var cpu = new CPU({
-	settings: settings,
-	callback: socket_callback
-});
+	return plugins;
+}
 
-var MEM = require('./plugins/mem.js');
-var mem = new MEM({
-	settings: settings,
-	callback: socket_callback
-});
+var plugins = loadPlugins(settings, socket_callback);
 
 var user_count = 0;
 var isRunning = false;
@@ -38,9 +40,9 @@ app.io.sockets.on('connection', function(socket) {
 	app.io.broadcast('usercount_update', user_count);
 
 	if (!isRunning) {
-		vnstat.start();
-		cpu.start();
-		mem.start();
+		plugins.forEach(function(plugin) {
+			plugin.start();
+		});
 		isRunning = true;
 	}
 
@@ -51,16 +53,15 @@ app.io.sockets.on('connection', function(socket) {
 		app.io.broadcast('usercount_update', user_count);
 
 		if (isRunning) {
-			vnstat.stop();
-			cpu.stop();
-			mem.stop();
+			plugins.forEach(function(plugin) {
+				plugin.stop();
+			});
 			isRunning = false;
 		}
 	});
 });
 
-
-app.use('/bower',  express.static(path.join(__dirname, '/bower_components')));
+app.use('/node_modules',  express.static(path.join(__dirname, '/node_modules')));
 app.use('/static', express.static(path.join(__dirname, '/static')));
 
 app.get('/', function(req, res) {
@@ -69,6 +70,6 @@ app.get('/', function(req, res) {
 });
 
 app.listen(settings.get('port'), function() {
-	console.log("listening port ", 8083);
+	console.log("listening port ", settings.get('port'));
 });
 

@@ -23,6 +23,7 @@ vnstat.prototype.init = function (options) {
 	//TODO error handling
 	this.settings = options.settings;
 	this.callback = options.callback;
+	this.ifaceFilter = options.ifaceFilter || [];
 };
 
 /**
@@ -35,7 +36,11 @@ vnstat.prototype._startVnstat = function(iface) {
 		return false;
 	}
 
+	try {
 	this._vnstat_process[iface] = child_process.spawn('vnstat', ['-i',iface, '--live','0']);
+	} catch(err) {
+		throw new Error('could not start "vnstat". Make sure it is installed.: ', err);
+	}
 	this._vnstat_process[iface].stdout.on('data', function(data) {
 		var line = decoder.write(data);
 
@@ -97,7 +102,7 @@ vnstat.prototype._stopVnstat = function(iface) {
  */
 vnstat.prototype.start = function() {
 	this.ifaces = _.keys(os.networkInterfaces());
-	this.ifaces = _.difference(this.ifaces, this.settings.get('ifaces')) || [];
+	this.ifaces = _.difference(this.ifaces, this.ifaceFilter) || [];
 
 	this.callback('initialize', {
 		hostname: os.hostname(),
