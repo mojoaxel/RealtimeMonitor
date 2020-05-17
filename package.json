@@ -17,7 +17,7 @@
     "connect": "^3.7.0",
     "express.io": "~1.1.13",
     "freem": "github:mojoaxel/freem",
-    "jquery": "^2.2.4",
+    "jquery": "^3.5.0",
     "lodash": "^4.17.15",
     "lodash-node": "^3.10.2",
     "nconf": "~0.10.0",
